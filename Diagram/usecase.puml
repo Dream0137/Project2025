@@ -1,0 +1,54 @@
+@startuml
+' ตั้งค่า theme และ style ของ diagram
+skinparam actorStyle stick
+skinparam packageStyle rectangle
+left to right direction
+
+' ประกาศ Actor (ผู้ใช้งาน)
+actor Guest
+actor Customer
+actor Admin
+
+rectangle "ระบบจองโต๊ะบอร์ดเกม" {
+  ' Use Cases สำหรับ Guest
+  usecase "เข้าสู่ระบบ" as UC1
+  usecase "สมัครสมาชิก" as UC2
+  usecase "ลืมรหัสผ่าน" as UC3
+
+  ' Use Cases สำหรับ Customer
+  usecase "จองคิวโต๊ะบอร์ดเกม" as UC5
+  usecase "ดูข้อมูลการจองโต๊ะ" as UC12
+  usecase "แก้ไขข้อมูลส่วนตัว" as UC4
+
+  usecase "เลือกวันและเวลา" as UC5a
+  usecase "เลือกอุปกรณ์ (เกม)" as UC5b
+
+  ' Use Cases สำหรับ Admin
+  usecase "จัดการ Configure ระบบ" as UC6
+  usecase "จัดการรายการจอง" as UC7
+  usecase "จัดการข้อมูลโต๊ะ" as UC8
+  usecase "จัดการข้อมูล User" as UC9
+  usecase "ดูประวัติการจองของลูกค้า" as UC10
+  usecase "จัดการข้อมูลอุปกรณ์เสริม" as UC11
+}
+
+Guest -- UC1
+Guest -- UC2
+Guest -- UC3
+
+Customer -- UC4
+Customer -- UC12
+Customer -- UC5
+Admin -- UC4
+Admin -- UC6
+Admin -- UC7
+Admin -- UC8
+Admin -- UC9
+Admin -- UC10
+Admin -- UC11
+
+' กำหนดความสัมพันธ์แบบ <<include>>
+' การจองโต๊ะ ต้องมีการเลือกวันเวลาและอุปกรณ์เสมอ
+UC5 ..> UC5a : <<include>>
+UC5 ..> UC5b : <<include>>
+@enduml
