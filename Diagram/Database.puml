@@ -53,7 +53,6 @@ entity "BookingItems" as booking_item {
   --
   BookingID : int <<FK>>
   GameID : int <<FK>>
-  Quantity : int
 }
 
 user "1" -- "0..N" booking : creates
@@ -61,5 +60,6 @@ table "1" -- "0..N" booking : contains
 timeslot "1" -- "0..N" booking : is selected
 booking "1" -- "0..N" booking_item : has
 game "1" -- "0..N" booking_item : requires
+
 
 @enduml
