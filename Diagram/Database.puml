@@ -1,0 +1,65 @@
+@startuml
+!theme toy
+skinparam linetype ortho
+skinparam monochrome false
+
+entity "Users" as user {
+  * **UserID** : int <<PK>>
+  --
+  Username : varchar(255)
+  Password : varchar(255)
+  Email : varchar(255)
+  Name : varchar(255)
+  Role : enum (Customer, Admin)
+  Status : enum (Active, Suspended)
+  BehaviorScore : int
+}
+
+entity "Tables" as table {
+  * **TableID** : int <<PK>>
+  --
+  TableName : varchar(255)
+  Description : text
+}
+
+entity "Timeslots" as timeslot {
+  * **TimeslotID** : int <<PK>>
+  --
+  StartTime : time
+  EndTime : time
+}
+
+entity "Games" as game {
+  * **GameID** : int <<PK>>
+  --
+  GameName : varchar(255)
+  Description : text
+}
+
+entity "Bookings" as booking {
+  * **BookingID** : int <<PK>>
+  --
+  UserID : int <<FK>>
+  TableID : int <<FK>>
+  TimeslotID : int <<FK>>
+  BookingDate : date
+  PartySize : int
+  Status : enum (Pending, Confirmed, Cancelled)
+  Notes : text
+}
+
+entity "BookingItems" as booking_item {
+  * **BookingItemID** : int <<PK>>
+  --
+  BookingID : int <<FK>>
+  GameID : int <<FK>>
+  Quantity : int
+}
+
+user "1" -- "0..N" booking : creates
+table "1" -- "0..N" booking : contains
+timeslot "1" -- "0..N" booking : is selected
+booking "1" -- "0..N" booking_item : has
+game "1" -- "0..N" booking_item : requires
+
+@enduml
