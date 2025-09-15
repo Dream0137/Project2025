@@ -1,10 +1,14 @@
 @startuml
 !theme toy
 skinparam linetype ortho
-skinparam monochrome false
+hide circle
+hide stereotype
+skinparam entity {
+  arrowColor Black
+}
 
 entity "Users" as user {
-  * **UserID** : int <<PK>>
+  * UserID : int
   --
   Username : varchar(255)
   Password : varchar(255)
@@ -16,28 +20,28 @@ entity "Users" as user {
 }
 
 entity "Tables" as table {
-  * **TableID** : int <<PK>>
+  * TableID : int
   --
   TableName : varchar(255)
   Description : text
 }
 
 entity "Timeslots" as timeslot {
-  * **TimeslotID** : int <<PK>>
+  * TimeslotID : int
   --
   StartTime : time
   EndTime : time
 }
 
 entity "Games" as game {
-  * **GameID** : int <<PK>>
+  * GameID : int
   --
   GameName : varchar(255)
   Description : text
 }
 
 entity "Bookings" as booking {
-  * **BookingID** : int <<PK>>
+  * BookingID : int
   --
   UserID : int <<FK>>
   TableID : int <<FK>>
@@ -49,17 +53,17 @@ entity "Bookings" as booking {
 }
 
 entity "BookingItems" as booking_item {
-  * **BookingItemID** : int <<PK>>
+  * BookingItemID : int
   --
   BookingID : int <<FK>>
   GameID : int <<FK>>
 }
 
-user "1" -- "0..N" booking : creates
-table "1" -- "0..N" booking : contains
-timeslot "1" -- "0..N" booking : is selected
-booking "1" -- "0..N" booking_item : has
-game "1" -- "0..N" booking_item : requires
-
+user ||--o{ booking
+table ||--o{ booking
+timeslot ||--o{ booking
+booking ||--o{ booking_item
+game ||--o{ booking_item
 
 @enduml
+
