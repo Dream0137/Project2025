@@ -7,40 +7,44 @@ skinparam entity {
   arrowColor Black
 }
 
-entity "Users" as user {
+entity "1Users" as user {
   * UserID : int
   --
-  Username : varchar(255)
-  Password : varchar(255)
-  Email : varchar(255)
+  Username : varchar(150) <<UNIQUE>>
+  PasswordHash : varchar(255)
+  Email : varchar(255) <<UNIQUE>>
   Name : varchar(255)
-  Role : enum (Customer, Admin)
-  Status : enum (Active, Suspended)
+  Role : enum (customer, admin)
+  Status : enum (active, suspended)
   BehaviorScore : int
 }
 
-entity "Tables" as table {
+entity "2TablesBooking" as table {
   * TableID : int
   --
-  TableName : varchar(255)
+  TableName : varchar(255) <<UNIQUE>>
   Description : text
+  -- Optional --
+  Capacity : int
+  IsActive : boolean
 }
 
-entity "Timeslots" as timeslot {
+entity "3Timeslots" as timeslot {
   * TimeslotID : int
   --
   StartTime : time
   EndTime : time
 }
 
-entity "Games" as game {
+entity "4Games" as game {
   * GameID : int
   --
   GameName : varchar(255)
   Description : text
+  Image : varchar(255)
 }
 
-entity "Bookings" as booking {
+entity "5Bookings" as booking {
   * BookingID : int
   --
   UserID : int <<FK>>
@@ -50,9 +54,15 @@ entity "Bookings" as booking {
   PartySize : int
   Status : enum (Pending, Confirmed, Cancelled)
   Notes : text
+  CustomerName : varchar(255)
+  Phone : varchar(50)
+  Email : varchar(255)
+  CreatedAt : datetime
+  --
+  <<UNIQUE(TableID, TimeslotID, BookingDate)>>
 }
 
-entity "BookingItems" as booking_item {
+entity "6BookingItems" as booking_item {
   * BookingItemID : int
   --
   BookingID : int <<FK>>
@@ -66,4 +76,3 @@ booking ||--o{ booking_item
 game ||--o{ booking_item
 
 @enduml
-

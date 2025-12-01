@@ -5,66 +5,111 @@ skinparam state {
   ArrowColor Black
 }
 
+'-------------------- MAIN STATES --------------------
 state "ไม่อยู่ในระบบ (Guest)" as GuestState
 state "ลูกค้า (Customer)" as CustomerState
-state "ผู้ดูแลระบบ (Admin)" as AdminState
+state "16ผู้ดูแลระบบ (Admin)" as AdminState
 
-state "จัดการโปรไฟล์ (Profile Management)" as ProfileManagement {
-    state "ดูข้อมูลส่วนตัว" as ViewProfile
-    state "แก้ไขข้อมูล" as EditProfile
+'-------------------- PROFILE --------------------
+state "จัดการโปรไฟล์" as ProfileManagement {
+  state "ดูข้อมูลส่วนตัว" as ViewProfile
+  state "แก้ไขข้อมูล" as EditProfile
 }
 
+'-------------------- ADMIN SECTION --------------------
 state "จัดการระบบ (System Management)" as AdminManagement {
-    state "จัดการการจอง" as ManageBookings
-    state "จัดการข้อมูลลูกค้า" as ManageCustomers
-    state "จัดการข้อมูลโต๊ะ" as ManageTables
-    state "จัดการข้อมูลเกม" as ManageGames
-    state "ตั้งค่าระบบ" as ConfigureSystem
+
+  ' หน้า Dashboard ของแอดมิน (จุดฟ้าข้างใน System Management)
+  state "Admin Dashboard" as AdminDashboard
+
+  ' หน้าจัดการย่อยต่าง ๆ
+  state "จัดการการจอง" as ManageBookings
+  state "จัดการข้อมูลลูกค้า" as ManageCustomers
+  state "จัดการข้อมูลโต๊ะ" as ManageTables
+  state "จัดการข้อมูลเกม" as ManageGames
+  state "ตั้งค่าระบบ" as ConfigureSystem
+
+  ' จุดเริ่มต้นของ System Management → Dashboard
+  [*] --> AdminDashboard : แสดงเมนูหลักของ Admin
+
+  ' ไปแต่ละส่วนจาก Dashboard
+  AdminDashboard --> ManageBookings    : Button 16.1
+  AdminDashboard --> ManageTables      : Button 16.2
+  AdminDashboard --> ManageCustomers  : Button 16.3
+  AdminDashboard --> ManageGames      : Button 16.4
+  AdminDashboard --> ConfigureSystem  : #16 Configure
+
+  ' 🔁 กลับมาที่ Dashboard หลังทำงานเสร็จ
+  ManageBookings --> AdminDashboard
+  ManageTables --> AdminDashboard
+  ManageCustomers --> AdminDashboard
+  ManageGames --> AdminDashboard
+  ConfigureSystem --> AdminDashboard
 }
 
+'-------------------- BOOKING FLOW --------------------
 state "การจอง (Booking)" as BookingProcess {
-    state "เลือกวัน" as SelectDate
-    state "เลือกโต๊ะและเวลา" as SelectTable
-    state "เลือกเกม(Button 10.1)" as SelectGame
-    state "ยืนยันการจอง(Button 11.1)" as ConfirmBooking
-    state "การจองสำเร็จ #12" as BookingSuccess
-    state "การจองล้มเหลว" as BookingFailed
+  state "เลือกวัน" as SelectDate
+  state "เลือกโต๊ะและเวลา" as SelectTable
+  state "เลือกเกม" as SelectGame
+  state "ยืนยันการจอง" as ConfirmBooking
+  state "การจองสำเร็จ" as BookingSuccess
+  state "การจองล้มเหลว" as BookingFailed
 }
 
+'-------------------- START --------------------
 [*] --> GuestState : เริ่มต้น
 
-GuestState --> CustomerState : เข้าสู่ระบบ(Button login 1.3)
-GuestState --> GuestState : ลืมรหัสผ่าน (Forget Password 1.1)
+'-------------------- GUEST --------------------
+GuestState --> CustomerState : Login (Button 1.3)
+GuestState --> GuestState      : ลืมรหัสผ่าน (Button 1.1)
+GuestState --> CustomerState  : Register (Button 1.2)
+GuestState --> AdminState      : Admin Login (Button 15.0)
 
-CustomerState --> ProfileManagement : เข้าสู่โปรไฟล์ (Profile 7.1)
-ProfileManagement --> ViewProfile : ดูข้อมูล
-ProfileManagement --> EditProfile : แก้ไขข้อมูลส่วนตัว (Button 13.1)
-EditProfile --> ViewProfile : บันทึก (Button 13.1.1)
-
-CustomerState --> CustomerState : ดูประวัติการจอง (Button 7.3)
-CustomerState --> GuestState : ออกจากระบบ (Button 13.2)
-
-AdminState --> AdminManagement : เข้าสู่ระบบจัดการ (Button 15.1)
-AdminManagement --> ManageBookings : จัดการรายการจอง (Button 16.1)
-AdminManagement --> ManageCustomers : จัดการข้อมูลลูกค้า (Button 16.3)
-AdminManagement --> ManageTables : จัดการข้อมูลโต๊ะ (Button 16.2)
-AdminManagement --> ManageGames : จัดการข้อมูลเกม (Button 16.4)
-AdminManagement --> ConfigureSystem : จัดการ Configure ระบบ #16
-
-AdminState --> GuestState : ออกจากระบบ
-
-CustomerState -[hidden]-> AdminState
-
+'-------------------- CUSTOMER MAIN --------------------
 CustomerState --> BookingProcess : เริ่มจองโต๊ะ (Button 7.2)
+CustomerState --> ProfileManagement : เข้าสู่โปรไฟล์ (Button 7.1)
+CustomerState --> CustomerState : ดูประวัติการจอง (Button 7.3)
+CustomerState --> GuestState : Logout (Button 13.2)
+
+'-------------------- PROFILE FLOW --------------------
+ProfileManagement --> ViewProfile
+ViewProfile --> EditProfile : แก้ไขข้อมูล (Button 13.1)
+EditProfile --> ViewProfile : บันทึก (Button 13.1.1)
+ProfileManagement --> CustomerState : กลับหน้าหลัก (Home 7.0)
+
+'-------------------- BOOKING FLOW --------------------
+' บรรทัดนี้ถูกลบไป (CustomerState --> BookingProcess) เนื่องจากซ้ำซ้อน
+' และมีบรรทัดด้านบนที่กำหนด Event แล้ว (CustomerState --> BookingProcess : เริ่มจองโต๊ะ (Button 7.2))
 
 BookingProcess --> SelectDate
+
 SelectDate --> SelectTable : เลือกวัน (Button 8.1)
-SelectTable --> SelectGame : เลือกโต๊ะและเวลา (Button 9.1)
+SelectDate --> CustomerState : ยกเลิก
+
+SelectTable --> SelectGame : เลือกโต๊ะ & เวลา (Button 9.1)
+SelectTable --> SelectDate : แก้ไขวัน (Back 9.2)
+SelectTable --> CustomerState : ยกเลิก
+
 SelectGame --> ConfirmBooking : เลือกเกม (Button 10.3)
-ConfirmBooking --> BookingSuccess : ยืนยันสำเร็จ
-ConfirmBooking --> BookingFailed : **(Error)** จองซ้ำซ้อน
+SelectGame --> SelectTable : กลับ (Button 10.2)
+SelectGame --> CustomerState : ยกเลิก
 
-BookingSuccess --> CustomerState : กลับสู่หน้าหลัก (Home 12.1)
+ConfirmBooking --> BookingSuccess : สำเร็จ
+ConfirmBooking --> BookingFailed  : Error (จองซ้ำ)
+ConfirmBooking --> SelectGame : แก้ไขเกม (Button 11.2)
+ConfirmBooking --> CustomerState : ยกเลิก
+
+BookingSuccess --> CustomerState : กลับ Home (Btn 12.1)
+BookingSuccess --> BookingProcess : จองต่อ (Btn 12.2)
+
 BookingFailed --> SelectDate : ลองใหม่
+BookingFailed --> CustomerState : กลับ Home
 
+'-------------------- ADMIN --------------------
+AdminState --> AdminManagement : เข้าสู่ระบบ (Btn 15.1)
+AdminState --> GuestState : Logout
+
+'-------------------- END --------------------
+CustomerState -[hidden]-> AdminState
 @enduml
