@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}ยกเลิกการจอง{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center mt-16">
+  <div class="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+    <h2 class="text-lg font-semibold mb-4 text-center">ยกเลิกการจอง</h2>
+    <p class="text-sm text-center mb-4">
+      ต้องการยกเลิกการจองวันที่
+      <span class="font-medium">{{ booking.booking_date }}</span><br>
+      โต๊ะ {{ booking.table.table_name }},
+      เวลา {{ booking.timeslot.start_time|time:"H:i" }} - {{ booking.timeslot.end_time|time:"H:i" }}
+      ใช่หรือไม่?
+    </p>
+
+    <form method="post" class="flex justify-center gap-3 mt-4">
+      {% csrf_token %}
+      <a href="{% url 'booking_history' %}"
+         class="px-4 py-2 rounded-full border text-sm text-slate-600">
+        กลับ
+      </a>
+      <button type="submit"
+              class="px-4 py-2 rounded-full bg-red-500 text-white text-sm">
+        ยืนยันยกเลิก
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}เลือกเกม{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+  <h2 class="text-lg font-semibold">
+    วันที่ {{ booking_date }} | โต๊ะ: {{ table.table_name }} |
+    เวลา {{ start_time|time:"H:i" }} - {{ end_time|time:"H:i" }}
+  </h2>
+
+  <p class="text-sm text-slate-600">
+    เลือกได้หลายเกม โดยใส่ <b>จำนวนชุด</b> ของแต่ละเกม (0 = ไม่เลือก) และระบบจะตรวจสอบจำนวนคงเหลือในช่วงเวลาที่เลือก (ตามช่วงเวลา)
+  </p>
+
+  <form method="post" action="{% url 'booking_summary' %}" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- hidden main context -->
+    <input type="hidden" name="date" value="{{ booking_date|date:'Y-m-d' }}">
+    <input type="hidden" name="table_id" value="{{ table.id }}">
+    <input type="hidden" name="timeslot_ids" value="{{ timeslot_ids }}">
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {% for game in games %}
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        {% if game.image %}
+          <img src="{{ game.image.url }}" alt="{{ game.game_name }}"
+               class="w-full h-40 object-cover">
+        {% else %}
+          <div class="w-full h-40 flex items-center justify-center bg-slate-200 text-slate-500 text-sm">
+            ไม่มีรูปเกม
+          </div>
+        {% endif %}
+
+        <div class="p-3 space-y-2">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-semibold text-sm">{{ game.game_name }}</p>
+              {% if game.description %}
+                <p class="text-xs text-slate-500 line-clamp-2">{{ game.description }}</p>
+              {% endif %}
+              <p class="text-xs text-slate-600 mt-1">
+                คงเหลือวันนี้: <b>{{ game.remaining }}</b> / {{ game.stock }} ชุด
+              </p>
+            </div>
+
+            <div class="flex flex-col items-end">
+              <label class="text-xs text-slate-500">จำนวน</label>
+              <input
+                type="number"
+                name="qty_{{ game.id }}"
+                min="0"
+                max="{{ game.remaining }}"
+                value="0"
+                class="w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-right outline-none focus:ring-2 focus:ring-slate-300"
+              >
+            </div>
+          </div>
+
+          {% if game.remaining == 0 %}
+            <p class="text-xs text-rose-600">เต็มแล้วสำหรับวันนี้</p>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+        <p class="text-sm text-slate-500">ยังไม่มีการเพิ่มเกมในระบบ</p>
+      {% endfor %}
+    </div>
+
+    <div class="flex justify-between items-center">
+      <a href="javascript:history.back()" class="text-sm text-slate-500 hover:underline">&larr; กลับ</a>
+      <button type="submit"
+              class="px-6 py-2 rounded-full bg-amber-400 text-slate-900 text-sm font-medium shadow hover:bg-amber-300">
+        สรุปการจองต่อ →
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

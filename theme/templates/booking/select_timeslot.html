@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}เลือกโต๊ะและเวลา{% endblock %}
+
+{% block content %}
+<h1 class="text-xl font-semibold mb-2">เลือกโต๊ะและช่วงเวลา</h1>
+<p class="text-sm text-slate-500 mb-4">วันที่ {{ booking_date }}</p>
+
+{% if tables and timeslots %}
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="booking_date" value="{{ booking_date|date:'Y-m-d' }}">
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% for table in tables %}
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <h2 class="font-semibold mb-3">โต๊ะ {{ table.table_name }}</h2>
+
+      <div class="space-y-2">
+        {% for slot in timeslots %}
+          {% if slot.id in table.booked_slot_ids %}
+            <div class="px-4 py-2 text-xs rounded bg-red-200 text-red-900 cursor-not-allowed flex justify-between">
+              <span>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</span>
+              <span class="font-bold">จองแล้ว</span>
+            </div>
+          {% else %}
+            <label class="flex items-center justify-between px-4 py-2 text-xs rounded border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 cursor-pointer">
+              <span>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</span>
+              <input type="checkbox"
+                     name="slots"
+                     value="{{ table.id }}-{{ slot.id }}"
+                     class="w-4 h-4 text-emerald-600 border-slate-300 rounded">
+            </label>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-6 flex justify-end">
+    <button type="submit"
+            class="px-6 py-2 rounded-full bg-amber-400 text-slate-900 text-sm font-medium hover:bg-amber-300 shadow-sm">
+      เลือกเกม
+    </button>
+  </div>
+</form>
+{% else %}
+  <p class="text-sm text-red-500">ยังไม่มีการตั้งค่าโต๊ะหรือช่วงเวลาในระบบ</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home - Board Game Cafe{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center">
+  <div class="max-w-5xl w-full mx-auto">
+
+    <h1 class="text-3xl md:text-4xl font-bold text-center mb-2">
+      จองโต๊ะเล่นบอร์ดเกม
+    </h1>
+    <p class="text-center text-slate-500 text-sm md:text-base mb-8">
+      เลือกวัน เวลา โต๊ะ และบอร์ดเกมที่ต้องการ แล้วมาเล่นสนุกกับเพื่อน ๆ ได้เลย
+    </p>
+
+    <!-- Gallery ภาพ -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div class="aspect-video rounded-xl overflow-hidden">
+        <img src="{% static 'img/home1.jpg' %}" alt="บรรยากาศร้าน" class="w-full h-full object-cover">
+      </div>
+      <div class="aspect-video rounded-xl overflow-hidden">
+        <img src="{% static 'img/home2.jpg' %}" alt="เลือกเกม" class="w-full h-full object-cover">
+      </div>
+      <div class="aspect-video rounded-xl overflow-hidden">
+        <img src="{% static 'img/home3.jpg' %}" alt="เล่นเกมกับเพื่อน" class="w-full h-full object-cover">
+      </div>
+      <div class="aspect-video rounded-xl overflow-hidden">
+        <img src="{% static 'img/home4.jpg' %}" alt="Catan" class="w-full h-full object-cover">
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+  <div class="flex flex-col items-end gap-3">
+    <a href="{% url 'select_date' %}"
+      class="px-6 py-3 rounded-full bg-amber-400 text-slate-900 font-medium hover:bg-amber-300 shadow-sm">
+      จองโต๊ะ
+    </a>
+    <a href="{% url 'booking_history' %}"
+      class="px-6 py-2 rounded-full border border-slate-300 text-slate-700 text-sm hover:bg-slate-50">
+      ดูประวัติการจอง
+    </a>
+  </div>
+{% else %}
+  <div class="flex flex-col items-end gap-3">
+    <a href="{% url 'login' %}"
+      class="px-6 py-3 rounded-full bg-amber-400 text-slate-900 font-medium hover:bg-amber-300 shadow-sm">
+      เข้าสู่ระบบเพื่อเริ่มจอง
+    </a>
+    <a href="{% url 'register' %}"
+      class="px-6 py-2 rounded-full border border-slate-300 text-slate-700 text-sm hover:bg-slate-50">
+      สมัครสมาชิก
+    </a>
+  </div>
+{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">{{ title }}</h1>
+  {% if back_url %}
+    <a href="{{ back_url }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm hover:bg-slate-100">ย้อนกลับ</a>
+  {% endif %}
+</div>
+
+<div class="bg-white rounded-xl shadow-sm p-5">
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="p-3 rounded-lg bg-red-50 text-red-700 text-sm">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <div>
+        <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <p class="text-xs text-slate-500 mt-1">{{ field.help_text }}</p>
+        {% endif %}
+        {% if field.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ field.errors|striptags }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div class="flex gap-2 pt-2">
+      <button type="submit" class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">บันทึก</button>
+      {% if back_url %}
+        <a href="{{ back_url }}" class="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm hover:bg-slate-100">ยกเลิก</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

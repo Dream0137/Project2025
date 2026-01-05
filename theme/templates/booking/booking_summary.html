@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}สรุปการจอง{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+  <h2 class="text-lg font-semibold">
+    วันที่ {{ booking_date }}
+    | โต๊ะ {{ table.table_name }}
+    | เวลา {{ start_time|time:"H:i" }} - {{ end_time|time:"H:i" }}
+    | จำนวนคน: {{ party_size }}
+  </h2>
+
+  <div class="bg-slate-50 rounded-xl p-6">
+    <form method="post" action="{% url 'booking_success' %}" class="space-y-3">
+      {% csrf_token %}
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-sm mb-1">ชื่อ</label>
+          <input name="name" value="{{ name }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">เบอร์โทร</label>
+          <input name="phone" value="{{ phone }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">อีเมล</label>
+          <input name="email" value="{{ email }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">จำนวนคน</label>
+        <input type="number" name="party_size" min="1" value="{{ party_size }}"
+               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">เกมที่เลือก</label>
+        <div class="border rounded px-3 py-2 w-full text-sm bg-white">
+          {% if selected_games %}
+            <ul class="list-disc list-inside text-sm space-y-1">
+              {% for row in selected_games %}
+                <li>
+                  {{ row.game.game_name }} × <b>{{ row.qty }}</b>
+                  <span class="text-xs text-slate-500">(เหลือวันนี้ {{ row.remaining }})</span>
+                </li>
+                <!-- ส่ง id + qty เกมกลับไปด้วย -->
+                <input type="hidden" name="game_ids" value="{{ row.game.id }}">
+                <input type="hidden" name="game_qtys" value="{{ row.qty }}">
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span class="text-slate-400 text-xs">ยังไม่ได้เลือกเกม</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- hidden main context -->
+      <input type="hidden" name="date" value="{{ booking_date|date:'Y-m-d' }}">
+      <input type="hidden" name="table_id" value="{{ table.id }}">
+      <input type="hidden" name="timeslot_ids" value="{{ timeslot_ids }}">
+
+      <div class="flex justify-end pt-4">
+        <button type="submit"
+                class="px-6 py-2 rounded-full bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-400">
+          Confirm
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

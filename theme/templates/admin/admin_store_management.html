@@ -1,0 +1,48 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Store Management (Games)</h1>
+  <a href="{% url 'admin_game_create' %}" class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">+ เพิ่มเกม</a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <table class="min-w-full text-sm">
+    <thead class="bg-slate-100 border-b border-slate-200">
+      <tr class="text-left">
+        <th class="px-4 py-2">รูป</th>
+        <th class="px-4 py-2">ชื่อเกม</th>
+        <th class="px-4 py-2">รายละเอียด</th>
+        <th class="px-4 py-2 text-right">จัดการ</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for g in games %}
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="px-4 py-2">
+          {% if g.image %}
+            <img src="{{ g.image.url }}" alt="{{ g.game_name }}" class="w-12 h-12 object-cover rounded-lg" />
+          {% else %}
+            <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400">N/A</div>
+          {% endif %}
+        </td>
+        <td class="px-4 py-2 font-medium">{{ g.game_name }}</td>
+        <td class="px-4 py-2 text-slate-600">{{ g.description|default:"-"|truncatechars:80 }}</td>
+        <td class="px-4 py-2">
+          <div class="flex justify-end gap-2">
+            <a href="{% url 'admin_game_update' g.id %}" class="px-3 py-1 rounded border border-slate-300 bg-white text-xs hover:bg-slate-100">แก้ไข</a>
+            <a href="{% url 'admin_game_delete' g.id %}" class="px-3 py-1 rounded border border-red-200 bg-red-50 text-xs text-red-700 hover:bg-red-100">ลบ</a>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="4" class="px-4 py-4 text-center text-slate-400">
+          ยังไม่มีข้อมูลเกมในระบบ
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

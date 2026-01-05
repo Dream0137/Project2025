@@ -1,0 +1,38 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Tables</h1>
+  <a href="{% url 'admin_table_create' %}" class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">+ เพิ่มโต๊ะ</a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <table class="min-w-full text-sm">
+    <thead class="bg-slate-100 border-b border-slate-200">
+      <tr class="text-left">
+        <th class="px-4 py-2">ชื่อโต๊ะ</th>
+        <th class="px-4 py-2">คำอธิบาย</th>
+        <th class="px-4 py-2 text-right">จัดการ</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for t in tables %}
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="px-4 py-2 font-medium">{{ t.table_name }}</td>
+        <td class="px-4 py-2 text-slate-600">{{ t.description|default:"-" }}</td>
+        <td class="px-4 py-2">
+          <div class="flex justify-end gap-2">
+            <a href="{% url 'admin_table_update' t.id %}" class="px-3 py-1 rounded border border-slate-300 bg-white text-xs hover:bg-slate-100">แก้ไข</a>
+            <a href="{% url 'admin_table_delete' t.id %}" class="px-3 py-1 rounded border border-red-200 bg-red-50 text-xs text-red-700 hover:bg-red-100">ลบ</a>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="3" class="px-4 py-6 text-center text-slate-400">ยังไม่มีโต๊ะ</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

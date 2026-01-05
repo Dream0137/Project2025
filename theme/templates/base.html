@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Board Game Cafe{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-900">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-amber-400 flex items-center justify-center font-bold text-slate-900">
+                    BG
+                </div>
+                <div class="text-lg font-semibold">Board Game Cafe</div>
+            </div>
+
+            <nav class="flex items-center gap-4 text-sm">
+                <a href="{% url 'home' %}" class="hover:text-amber-500">Home</a>
+                <a href="{% url 'select_date' %}" class="hover:text-amber-500">Booking</a>
+                <a href="{% url 'booking_history' %}" class="hover:text-amber-500">History</a>
+
+                {% if request.user.is_authenticated %}
+                <span class="text-slate-500 hidden sm:inline">สวัสดี, {{ request.user.username }}</span>
+                <a href="{% url 'logout' %}"
+                    class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-50">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}"
+                    class="px-3 py-1 rounded border border-slate-300 hover:bg-slate-50">Login</a>
+                <a href="{% url 'register' %}"
+                    class="px-3 py-1 rounded bg-amber-400 text-slate-900 hover:bg-amber-300">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="py-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="bg-white rounded-xl shadow-sm p-6 min-h-[400px]">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>

@@ -1,0 +1,62 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Booking Management</h1>
+  <a href="{% url 'admin_booking_create' %}" class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">+ เพิ่มการจอง</a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <table class="min-w-full text-sm">
+    <thead class="bg-slate-100 border-b border-slate-200">
+      <tr class="text-left">
+        <th class="px-4 py-2">ชื่อ</th>
+        <th class="px-4 py-2">อีเมล</th>
+        <th class="px-4 py-2">วันที่</th>
+        <th class="px-4 py-2">โต๊ะ</th>
+        <th class="px-4 py-2">ช่วงเวลา</th>
+        <th class="px-4 py-2">สถานะ</th>
+        <th class="px-4 py-2 text-center">จำนวนคน</th>
+        <th class="px-4 py-2 text-right">จัดการ</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for b in bookings %}
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="px-4 py-2">{{ b.customer_name|default:b.user.username }}</td>
+        <td class="px-4 py-2 text-xs">{{ b.email }}</td>
+        <td class="px-4 py-2">{{ b.booking_date }}</td>
+        <td class="px-4 py-2">โต๊ะ {{ b.table.table_name }}</td>
+        <td class="px-4 py-2">
+          {{ b.timeslot.start_time|time:"H:i" }} - {{ b.timeslot.end_time|time:"H:i" }}
+        </td>
+        <td class="px-4 py-2">
+          {% if b.status == "Confirmed" %}
+            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">confirmed</span>
+          {% elif b.status == "Pending" %}
+            <span class="px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700">not confirm</span>
+          {% elif b.status == "Cancelled" %}
+            <span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">cancelled</span>
+          {% else %}
+            <span class="text-xs text-slate-500">{{ b.status }}</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-2 text-center">{{ b.party_size }}</td>
+        <td class="px-4 py-2">
+          <div class="flex justify-end gap-2">
+            <a href="{% url 'admin_booking_update' b.id %}" class="px-3 py-1 rounded border border-slate-300 bg-white text-xs hover:bg-slate-100">แก้ไข</a>
+            <a href="{% url 'admin_booking_delete' b.id %}" class="px-3 py-1 rounded border border-red-200 bg-red-50 text-xs text-red-700 hover:bg-red-100">ลบ</a>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="8" class="px-4 py-4 text-center text-slate-400">
+          ยังไม่มีการจองในระบบ
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

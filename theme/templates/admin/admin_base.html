@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Admin - Board Game Cafe{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-80px)] flex bg-slate-100">
+
+  <!-- Sidebar -->
+  <aside class="w-56 bg-slate-200 border-r border-slate-300 flex flex-col">
+    <div class="px-4 py-4 font-bold text-lg">
+      Admin Panel
+    </div>
+
+    <nav class="flex-1 flex flex-col gap-1 px-2 text-sm">
+      <a href="{% url 'admin_dashboard' %}"
+         class="px-3 py-2 rounded hover:bg-slate-300">
+        Dashboard
+      </a>
+      <a href="{% url 'admin_booking_list' %}"
+         class="px-3 py-2 rounded hover:bg-slate-300">
+        Booking Management
+      </a>
+      <a href="{% url 'admin_store_management' %}"
+         class="px-3 py-2 rounded hover:bg-slate-300">
+        Store Management
+      </a>
+      <a href="{% url 'admin_table_list' %}"
+         class="px-3 py-2 rounded hover:bg-slate-300">
+        Tables
+      </a>
+      <a href="{% url 'admin_customer_list' %}"
+         class="px-3 py-2 rounded hover:bg-slate-300">
+        Customer Data Management
+      </a>
+    </nav>
+
+    <div class="p-4">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full px-3 py-2 rounded border border-slate-400 text-sm hover:bg-slate-300">
+          Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 p-6">
+    {% block admin_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

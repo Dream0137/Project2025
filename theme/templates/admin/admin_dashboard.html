@@ -1,0 +1,114 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <h1 class="text-2xl font-bold">Dashboard</h1>
+    <p class="text-sm text-slate-500">สรุปข้อมูล ณ วันที่ {{ today }}</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-xl shadow-sm p-4">
+    <p class="text-xs text-slate-500 mb-1">วันนี้: ทั้งหมด</p>
+    <p class="text-3xl font-bold">{{ stats.today_total }}</p>
+    <p class="text-xs text-slate-500 mt-2">Pending {{ stats.today_pending }} • Confirmed {{ stats.today_confirmed }} • Cancelled {{ stats.today_cancelled }}</p>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm p-4">
+    <p class="text-xs text-slate-500 mb-1">ทั้งหมดในระบบ</p>
+    <p class="text-3xl font-bold">{{ stats.all_total }}</p>
+    <p class="text-xs text-slate-500 mt-2">Pending {{ stats.all_pending }} • Confirmed {{ stats.all_confirmed }} • Cancelled {{ stats.all_cancelled }}</p>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm p-4">
+    <p class="text-xs text-slate-500 mb-1">Master Data</p>
+    <p class="text-sm text-slate-700">โต๊ะ: <span class="font-semibold">{{ stats.table_count }}</span></p>
+    <p class="text-sm text-slate-700">ช่วงเวลา: <span class="font-semibold">{{ stats.timeslot_count }}</span></p>
+    <p class="text-sm text-slate-700">เกม: <span class="font-semibold">{{ stats.game_count }}</span></p>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm p-4">
+    <p class="text-xs text-slate-500 mb-1">ผู้ใช้ในระบบ</p>
+    <p class="text-3xl font-bold">{{ stats.customer_count }}</p>
+  </div>
+</div>
+
+{{ trend_labels|json_script:"trendLabels" }}
+{{ trend_values|json_script:"trendValues" }}
+{{ status_dist|json_script:"statusDist" }}
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  <div class="bg-white rounded-xl shadow-sm p-4">
+    <h2 class="font-semibold mb-2">สัดส่วนสถานะการจอง (ทั้งหมด)</h2>
+    <canvas id="statusChart" height="160"></canvas>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm p-4">
+    <h2 class="font-semibold mb-2">จำนวนการจองย้อนหลัง 7 วัน</h2>
+    <canvas id="trendChart" height="160"></canvas>
+  </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm p-4">
+  <h2 class="font-semibold mb-3">รายการล่าสุด</h2>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-100 border-b border-slate-200">
+        <tr class="text-left">
+          <th class="px-4 py-2">วันที่</th>
+          <th class="px-4 py-2">โต๊ะ</th>
+          <th class="px-4 py-2">ช่วงเวลา</th>
+          <th class="px-4 py-2">ลูกค้า</th>
+          <th class="px-4 py-2">สถานะ</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for b in recent %}
+        <tr class="border-b border-slate-100">
+          <td class="px-4 py-2">{{ b.booking_date }}</td>
+          <td class="px-4 py-2">{{ b.table.table_name }}</td>
+          <td class="px-4 py-2">{{ b.timeslot.start_time|time:"H:i" }}-{{ b.timeslot.end_time|time:"H:i" }}</td>
+          <td class="px-4 py-2">{{ b.customer_name|default:b.user.username }}</td>
+          <td class="px-4 py-2">{{ b.status }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">ยังไม่มีข้อมูล</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const trendLabels = JSON.parse(document.getElementById('trendLabels').textContent);
+  const trendValues = JSON.parse(document.getElementById('trendValues').textContent);
+  const statusDist = JSON.parse(document.getElementById('statusDist').textContent);
+
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: trendLabels,
+      datasets: [{
+        label: 'Bookings',
+        data: trendValues,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+
+  new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(statusDist),
+      datasets: [{ data: Object.values(statusDist) }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+{% endblock %}
