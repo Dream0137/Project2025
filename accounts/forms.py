@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
-
+from django.contrib.auth.password_validation import password_validators_help_text_html
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -11,6 +11,10 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = ('username', 'name', 'email', 'password1', 'password2')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["password1"].help_text = password_validators_help_text_html()
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label="Username")

@@ -7,27 +7,59 @@
 
     <form method="post" class="space-y-3">
         {% csrf_token %}
-        {{ form.non_field_errors }}
+
+        {% if form.non_field_errors %}
+            <div class="p-3 rounded bg-red-50 text-red-700 text-sm">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
 
         <div>
             <label class="block text-sm mb-1">Username</label>
             {{ form.username }}
+            {% for error in form.username.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
+
         <div>
             <label class="block text-sm mb-1">ชื่อ</label>
             {{ form.name }}
+            {% for error in form.name.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
+
         <div>
             <label class="block text-sm mb-1">Email</label>
             {{ form.email }}
+            {% for error in form.email.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
+
         <div>
             <label class="block text-sm mb-1">Password</label>
             {{ form.password1 }}
+
+            {# ✅ เงื่อนไขรหัสผ่าน (อัตโนมัติ) #}
+            {% if form.password1.help_text %}
+                <div class="text-xs text-slate-600 mt-2 space-y-1">
+                    {{ form.password1.help_text|safe }}
+                </div>
+            {% endif %}
+
+            {% for error in form.password1.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
+
         <div>
             <label class="block text-sm mb-1">ยืนยัน Password</label>
             {{ form.password2 }}
+            {% for error in form.password2.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
 
         <button class="w-full mt-2 px-4 py-2 bg-amber-400 text-slate-900 font-medium rounded hover:bg-amber-300">

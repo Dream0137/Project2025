@@ -57,9 +57,13 @@ def profile_view(request):
     # นับจำนวนการจองของผู้ใช้งาน
     from booking.models import Booking
     total_bookings = Booking.objects.filter(user=user).count()
+    
+    # ดึงการจองล่าสุด 5 รายการ
+    recent_bookings = Booking.objects.filter(user=user).order_by('-created_at')[:5]
 
     context = {
         "form": form,
         "total_bookings": total_bookings,
+        "recent_bookings": recent_bookings,
     }
     return render(request, "accounts/profile.html", context)
